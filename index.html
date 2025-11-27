@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mejorar texto con IA</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    h1 {
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      max-width: 700px;
+      width: 100%;
+    }
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      resize: vertical;
+      padding: 8px;
+      font-family: inherit;
+    }
+    select, button {
+      padding: 8px 12px;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    button {
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+    #resultado {
+      margin-top: 12px;
+      padding: 10px;
+      background: #f9fafb;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      min-height: 60px;
+    }
+    #error {
+      margin-top: 8px;
+      color: #b91c1c;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Mejorar texto con IA</h1>
+    <p>Escrib¡ algo y la IA lo reescribe mejor seg£n el estilo que elijas.</p>
+
+    <label for="modo">Modo:</label>
+    <select id="modo">
+      <option value="m s claro y sencillo">M s claro y sencillo</option>
+      <option value="m s profesional">M s profesional</option>
+      <option value="m s corto">M s corto</option>
+      <option value="m s detallado">M s detallado</option>
+    </select>
+
+    <label for="texto">Tu texto:</label>
+    <textarea id="texto" placeholder="Peg  ac  un texto que quieras mejorar..."></textarea>
+
+    <button id="btn">Mejorar texto</button>
+
+    <div id="error"></div>
+
+    <h3>Resultado:</h3>
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    const btn = document.getElementById("btn");
+    const textoEl = document.getElementById("texto");
+    const modoEl = document.getElementById("modo");
+    const resultadoEl = document.getElementById("resultado");
+    const errorEl = document.getElementById("error");
+
+    btn.addEventListener("click", async () => {
+      const texto = textoEl.value.trim();
+      const modo = modoEl.value;
+
+      if (!texto) {
+        errorEl.textContent = "Escrib¡ alg£n texto primero.";
+        return;
+      }
+
+      errorEl.textContent = "";
+      resultadoEl.textContent = "Procesando...";
+      btn.disabled = true;
+
+      try {
+        const res = await fetch("/api/mejora", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ texto, modo })
+        });
+
+        if (!res.ok) {
+          throw new Error("Error HTTP " + res.status);
+        }
+
+        const data = await res.json();
+        resultadoEl.textContent = data.resultado || "(Sin resultado)";
+      } catch (e) {
+        console.error(e);
+        errorEl.textContent = "Ocurri¢ un error llamando a la IA.";
+        resultadoEl.textContent = "";
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
