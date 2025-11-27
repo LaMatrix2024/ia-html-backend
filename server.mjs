@@ -7,6 +7,7 @@ app.use(express.static(".")); // si después querés servir el HTML desde Render
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+  projectId: process.env.OPENAI_PROJECT_ID   // ← nuevo
 });
 
 // Endpoint de mejora de texto
